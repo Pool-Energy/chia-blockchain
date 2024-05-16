@@ -57,7 +57,9 @@ if [ ${chia_mode} = "wallet" ]; then
 	fi
 
 	if [ -n "${CHIA_STDOUT}" ]; then
-		tail -F /root/.chia/mainnet/log/debug.log &
+		tail -F /root/.chia/mainnet/log/debug.log \
+			| grep -Ev 'time=".*" level=info msg="(recv|cron): chia_(full_node|wallet) (get_connections|sync_changed|updating file sizes)"$' \
+			&
 	fi
 
 	exec ./venv/bin/chia_wallet
@@ -85,7 +87,9 @@ else
 	fi
 
 	if [ -n "${CHIA_STDOUT}" ]; then
-		tail -F /root/.chia/mainnet/log/debug.log &
+		tail -F /root/.chia/mainnet/log/debug.log \
+			| grep -Ev 'time=".*" level=info msg="(recv|cron): chia_full_node (get_connections|signage_point|get_blockchain_state|block|get_block_count_metrics|updating file sizes)"$' \
+			&
 	fi
 
 	exec ./venv/bin/chia_full_node
