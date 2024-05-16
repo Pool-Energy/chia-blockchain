@@ -54,14 +54,14 @@ if [ ${chia_mode} = "wallet" ]; then
 	done
 
 	if [ -n "${CHIA_EXPORTER}" ]; then
-		/root/chia-exporter/chia_exporter serve &
+		/root/chia-exporter/chia_exporter serve 2>&1 >/dev/null &
 	fi
 
 	if [ -n "${CHIA_STDOUT}" ]; then
-		tail -F /root/.chia/mainnet/log/debug.log | egrep -v ${logexcluded} &
+		tail -F /root/.chia/mainnet/log/debug.log &
 	fi
 
-	exec ./venv/bin/chia_wallet | egrep -v ${logexcluded}
+	exec ./venv/bin/chia_wallet
 else
 
 	mkdir -p /root/.chia
@@ -82,12 +82,12 @@ else
 	done
 
 	if [ -n "${CHIA_EXPORTER}" ]; then
-		/root/chia-exporter/chia_exporter serve &
+		/root/chia-exporter/chia_exporter serve 2>&1 >/dev/null &
 	fi
 
 	if [ -n "${CHIA_STDOUT}" ]; then
-		tail -F /root/.chia/mainnet/log/debug.log | egrep -v ${logexcluded} &
+		tail -F /root/.chia/mainnet/log/debug.log &
 	fi
 
-	exec ./venv/bin/chia_full_node | egrep -v ${logexcluded}
+	exec ./venv/bin/chia_full_node
 fi
