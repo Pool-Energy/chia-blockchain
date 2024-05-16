@@ -1,11 +1,12 @@
 #!/bin/bash
+
 set -e
 
-# Remove IPv6 for now
+# Update /etc/hosts in container (IPv6 removed)
 grep -v "::" /etc/hosts > /tmp/tmphosts
-# /etc/hosts cannot be moved/removed
 cat /tmp/tmphosts > /etc/hosts
 
+# Check /data volume
 if [ ! -d "/data" ]; then
 	echo "Error: no /data to persist"
 	exit 1
@@ -13,15 +14,13 @@ fi
 
 network=${CHIA_NETWORK:=mainnet}
 chia_mode=${CHIA_MODE:=node}
-logexcluded='time=".*" level=info msg="(recv|cron): chia_(full_node|wallet) ((add|close)_connection|get_(connections|sync_status|blockchain_state|block_count_metrics)|signage_point|block|updating file sizes)(\\n)?"$'
 
 cd /root/chia-blockchain
 . ./activate
 
 if [ ${chia_mode} = "wallet" ]; then
 
-	rm -rf /root/.chia
-	rm -rf /root/.chia_keys
+	rm -rf /root/.chia /root/.chia_keys
 	if echo ${network} | grep -q testnet; then
 		chia init --testnet
 	else
@@ -45,7 +44,8 @@ if [ ${chia_mode} = "wallet" ]; then
 		cp -a /root/.chia/mainnet/config/ssl/* /data/wallet_${WALLET_ID:=1}_ssl/
 	fi
 
-	python3 /root/change_config.py
+	python3 /root/update-config.py
+	rm -rf /root/update-config.py
 
 	./venv/bin/python -m chia.daemon.server &
 	while ! nc -z -w 1 localhost 55400; do
@@ -62,6 +62,7 @@ if [ ${chia_mode} = "wallet" ]; then
 	fi
 
 	exec ./venv/bin/chia_wallet
+
 else
 
 	mkdir -p /root/.chia
@@ -74,6 +75,8 @@ else
 	fi
 
 	sed -i 's/self_hostname:.*/self_hostname: \&self_hostname 0.0.0.0/' /data/chia/${network}/config/config.yaml || true
+
+	rm -rf /root/update-config.py
 
 	./venv/bin/python -m chia.daemon.server &
 	while ! nc -z -w 1 localhost 55400; do
