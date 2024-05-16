@@ -57,7 +57,7 @@ if [ ${chia_mode} = "wallet" ]; then
 	fi
 
 	if [ -n "${CHIA_STDOUT}" ]; then
-		tail -f /root/.chia/mainnet/log/debug.log &
+		tail -F /root/.chia/mainnet/log/debug.log &
 	fi
 
 	exec ./venv/bin/chia_wallet
@@ -85,7 +85,7 @@ else
 	fi
 
 	if [ -n "${CHIA_STDOUT}" ]; then
-		tail -f /root/.chia/mainnet/log/debug.log &
+		tail -F /root/.chia/mainnet/log/debug.log &
 	fi
 
 	exec ./venv/bin/chia_full_node
