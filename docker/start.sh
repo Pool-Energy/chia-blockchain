@@ -13,6 +13,7 @@ fi
 
 network=${CHIA_NETWORK:=mainnet}
 chia_mode=${CHIA_MODE:=node}
+logexcluded='time=".*" level=info msg="(recv|cron): chia_(full_node|wallet) ((add|close)_connection|get_(connections|sync_status|blockchain_state|block_count_metrics)|signage_point|block|updating file sizes)(\\n)?"$'
 
 cd /root/chia-blockchain
 . ./activate
@@ -57,12 +58,10 @@ if [ ${chia_mode} = "wallet" ]; then
 	fi
 
 	if [ -n "${CHIA_STDOUT}" ]; then
-		tail -F /root/.chia/mainnet/log/debug.log \
-			| grep -Ev 'time=".*" level=info msg="(recv|cron): chia_(full_node|wallet) ((add|close)_connection|get_(connections|sync_status)|sync_changed|updating file sizes)(\\n)?"$' \
-			&
+		tail -F /root/.chia/mainnet/log/debug.log | egrep -v ${logexcluded} &
 	fi
 
-	exec ./venv/bin/chia_wallet
+	exec ./venv/bin/chia_wallet | egrep -v ${logexcluded}
 else
 
 	mkdir -p /root/.chia
@@ -87,10 +86,8 @@ else
 	fi
 
 	if [ -n "${CHIA_STDOUT}" ]; then
-		tail -F /root/.chia/mainnet/log/debug.log \
-			| grep -Ev 'time=".*" level=info msg="(recv|cron): chia_(full_node|wallet) ((add|close)_connection|get_(connections|sync_status)|signage_point|get_blockchain_state|block|get_block_count_metrics|updating file sizes)(\\n)?"$' \
-			&
+		tail -F /root/.chia/mainnet/log/debug.log | egrep -v ${logexcluded} &
 	fi
 
-	exec ./venv/bin/chia_full_node
+	exec ./venv/bin/chia_full_node | egrep -v ${logexcluded}
 fi
