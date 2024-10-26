@@ -24,7 +24,7 @@ LABEL maintainer="contact@pool.energy"
 RUN apt-get update && apt-get upgrade -y
 
 # Install git
-RUN apt-get install git python3-virtualenv lsb-release sudo procps tmux net-tools vim iputils-ping netcat-traditional -y
+RUN apt-get install git python3.11-venv lsb-release sudo procps tmux net-tools vim iputils-ping netcat-traditional -y
 
 WORKDIR /root/chia-exporter
 
