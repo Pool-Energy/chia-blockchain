@@ -45,7 +45,6 @@ if [ ${chia_mode} = "wallet" ]; then
 	fi
 
 	python3 /root/update-config.py
-	rm -rf /root/update-config.py
 
 	./venv/bin/python -m chia.daemon.server &
 	while ! nc -z -w 1 localhost 55400; do
@@ -75,8 +74,6 @@ else
 	fi
 
 	sed -i 's/self_hostname:.*/self_hostname: \&self_hostname 0.0.0.0/' /data/chia/${network}/config/config.yaml || true
-
-	rm -rf /root/update-config.py
 
 	./venv/bin/python -m chia.daemon.server &
 	while ! nc -z -w 1 localhost 55400; do
