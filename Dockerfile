@@ -15,7 +15,7 @@ RUN apk add --update --no-cache --virtual build-dependencies git ca-certificates
 # FINAL ENVIRONMENT #
 #####################
 
-FROM debian:stable-slim
+FROM debian:bookworm-slim
 
 # Identify the maintainer of an image
 LABEL maintainer="contact@pool.energy"
