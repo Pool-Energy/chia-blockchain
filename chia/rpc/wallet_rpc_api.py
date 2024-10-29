@@ -1274,11 +1274,11 @@ class WalletRpcApi:
             "transactions": [tx.to_json_dict_convenience(self.service.config) for tx in tx_list],
         }
 
-    async def push_transaction(self, request: Dict[str, Any]) -> EndpointResult:
+    async def push_transaction(self, request):
         assert self.service.wallet_state_manager is not None
 
         if await self.service.wallet_state_manager.synced() is False:
-            raise ValueError("Wallet needs to be fully synced before pushing transactions")
+            raise ValueError("Wallet needs to be fully synced before sending transactions")
 
         wallet_id = uint32(request["wallet_id"])
         wallet = self.service.wallet_state_manager.wallets[wallet_id]
