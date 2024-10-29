@@ -161,7 +161,6 @@ class WalletRpcApi:
             "/get_sync_status": self.get_sync_status,
             "/get_height_info": self.get_height_info,
             "/push_tx": self.push_tx,
-            "/push_transaction": self.push_transaction,
             "/push_transactions": self.push_transactions,
             "/get_timestamp_for_height": self.get_timestamp_for_height,
             "/set_auto_claim": self.set_auto_claim,
@@ -613,31 +612,12 @@ class WalletRpcApi:
         await self.service.push_tx(SpendBundle.from_bytes(hexstr_to_bytes(request["spend_bundle"])))
         return {}
 
-    async def push_transaction(self, request: Dict[str, Any]) -> EndpointResult:
+    async def push_transactions(self, request: Dict[str, Any]) -> EndpointResult:
         assert self.service.wallet_state_manager is not None
 
         if await self.service.wallet_state_manager.synced() is False:
             raise ValueError("Wallet needs to be fully synced before sending transactions")
 
-        txs: List[TransactionRecord] = []
-        for transaction_hexstr_or_json in request["transactions"]:
-            if isinstance(transaction_hexstr_or_json, str):
-                tx = TransactionRecord.from_bytes(hexstr_to_bytes(transaction_hexstr_or_json))
-                txs.append(tx)
-            else:
-                try:
-                    tx = TransactionRecord.from_json_dict_convenience(transaction_hexstr_or_json)
-                except AttributeError:
-                    tx = TransactionRecord.from_json_dict(transaction_hexstr_or_json)
-                txs.append(tx)
-
-        async with self.service.wallet_state_manager.lock:
-            await self.service.wallet_state_manager.add_pending_transactions(txs, sign=request.get("sign", False))
-
-        return {"success": True}
-
-
-    async def push_transactions(self, request: Dict[str, Any]) -> EndpointResult:
         txs: List[TransactionRecord] = []
         for transaction_hexstr_or_json in request["transactions"]:
             if isinstance(transaction_hexstr_or_json, str):
