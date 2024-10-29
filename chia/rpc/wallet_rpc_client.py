@@ -117,6 +117,9 @@ class WalletRpcClient(RpcClient):
     async def push_tx(self, spend_bundle: SpendBundle) -> Dict[str, Any]:
         return await self.fetch("push_tx", {"spend_bundle": bytes(spend_bundle).hex()})
 
+    async def push_transaction(self, wallet_id: str, transaction: TransactionRecord) -> Dict[str, Any]:
+        return await self.fetch("push_transaction", {"wallet_id": wallet_id, "transaction": transaction.to_json_dict()})
+
     async def push_transactions(self, txs: List[TransactionRecord]) -> Dict[str, Any]:
         transactions = [bytes(tx).hex() for tx in txs]
         return await self.fetch("push_transactions", {"transactions": transactions})
@@ -283,14 +286,6 @@ class WalletRpcClient(RpcClient):
         }
         response = await self.fetch("spend_clawback_coins", request)
         return response
-
-    async def push_transaction(
-        self,
-        wallet_id: str,
-        transaction: TransactionRecord,
-    ) -> None:
-        await self.fetch("push_transaction", {"wallet_id": wallet_id, "transaction": transaction.to_json_dict()})
-        return None
 
     async def delete_unconfirmed_transactions(self, wallet_id: int) -> None:
         await self.fetch("delete_unconfirmed_transactions", {"wallet_id": wallet_id})
