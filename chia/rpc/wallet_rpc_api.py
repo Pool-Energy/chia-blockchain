@@ -619,16 +619,23 @@ class WalletRpcApi:
         if await self.service.wallet_state_manager.synced() is False:
             raise ValueError("Wallet needs to be fully synced before sending transactions")
 
-        wallet_id = uint32(request["wallet_id"])
-        wallet = self.service.wallet_state_manager.wallets[wallet_id]
-        tx = TransactionRecord.from_json_dict(request["transaction"])
+        txs: List[TransactionRecord] = []
+        for transaction_hexstr_or_json in request["transactions"]:
+            if isinstance(transaction_hexstr_or_json, str):
+                tx = TransactionRecord.from_bytes(hexstr_to_bytes(transaction_hexstr_or_json))
+                txs.append(tx)
+            else:
+                try:
+                    tx = TransactionRecord.from_json_dict_convenience(transaction_hexstr_or_json)
+                except AttributeError:
+                    tx = TransactionRecord.from_json_dict(transaction_hexstr_or_json)
+                txs.append(tx)
 
         async with self.service.wallet_state_manager.lock:
-            if request.get("sign", False):
-                await wallet.sign_transaction(tx)
-            await wallet.add_pending_transactions([tx], sign=request.get("sign", False))
+            await self.service.wallet_state_manager.add_pending_transactions(txs, sign=request.get("sign", False))
 
-        return {}
+        return {"success": True}
+
 
     async def push_transactions(self, request: Dict[str, Any]) -> EndpointResult:
         txs: List[TransactionRecord] = []
