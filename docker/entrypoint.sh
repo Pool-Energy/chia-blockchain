@@ -2,11 +2,9 @@
 
 set -e
 
-# Update /etc/hosts in container (IPv6 removed)
 grep -v "::" /etc/hosts > /tmp/tmphosts
 cat /tmp/tmphosts > /etc/hosts
 
-# Check /data volume
 if [ ! -d "/data" ]; then
 	echo "Error: no /data to persist"
 	exit 1
@@ -17,6 +15,25 @@ chia_mode=${CHIA_MODE:=node}
 
 cd /root/chia-blockchain
 . ./activate
+
+echo "#########################################################################################################################"
+echo ""
+echo "       ██████ ██   ██ ██  █████        ██████  ██       ██████   ██████ ██   ██  ██████ ██   ██  █████  ██ ███    ██  "
+echo "      ██      ██   ██ ██ ██   ██       ██   ██ ██      ██    ██ ██      ██  ██  ██      ██   ██ ██   ██ ██ ████   ██  "
+echo "      ██      ███████ ██ ███████ █████ ██████  ██      ██    ██ ██      █████   ██      ███████ ███████ ██ ██ ██  ██  "
+echo "      ██      ██   ██ ██ ██   ██       ██   ██ ██      ██    ██ ██      ██  ██  ██      ██   ██ ██   ██ ██ ██  ██ ██  "
+echo "       ██████ ██   ██ ██ ██   ██       ██████  ███████  ██████   ██████ ██   ██  ██████ ██   ██ ██   ██ ██ ██   ████  "
+echo ""
+echo "#########################################################################################################################"
+echo "# This code is provided by Chia Network and is subject to the Chia Blockchain software license at https://www.chia.net/ #"
+echo "# All changes are made by the Pool.Energy team without any warranty. The maintainer is djerfy <djerfy@gmail.com>.       #"
+echo "#########################################################################################################################"
+echo ""
+echo "Using chia-blockchain:"
+echo "  * version: $(git branch --show-current)"
+echo "  * network: ${network}"
+echo "  * mode: ${chia_mode}"
+echo ""
 
 if [ ${chia_mode} = "wallet" ]; then
 
