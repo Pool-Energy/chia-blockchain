@@ -17,18 +17,15 @@ RUN apk add --update --no-cache --virtual build-dependencies git ca-certificates
 
 FROM debian:bookworm-slim
 
-# Identify the maintainer of an image
 LABEL maintainer="contact@pool.energy"
 
-# Update the image to the latest packages
-RUN apt-get update && apt-get upgrade -y
-
-# Install git
-RUN apt-get install git python3.11-venv lsb-release sudo procps tmux net-tools vim iputils-ping netcat-traditional -y
+RUN apt-get update && \
+    apt-get upgrade -y
+RUN apt-get install -y git python3-venv lsb-release sudo procps tmux net-tools vim iputils-ping netcat-traditional
 
 WORKDIR /root/chia-exporter
 
-COPY --from=build_chia_exporter /build/chia-exporter/chia_exporter .
+COPY --from=build_chia_exporter /build/chia-exporter/chia_exporter /root/chia-exporter/chia_exporter
 
 WORKDIR /root
 
@@ -38,12 +35,10 @@ WORKDIR /root/chia-blockchain
 
 RUN sh install.sh
 
-# Expose rpc ports
 EXPOSE 58444
 EXPOSE 8444
 EXPOSE 8555
 EXPOSE 9256
-# Chia prometheus exporter
 EXPOSE 9914
 
 COPY ./docker/entrypoint.sh /entrypoint.sh
