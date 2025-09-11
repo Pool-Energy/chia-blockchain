@@ -14,7 +14,7 @@ homepage = "https://chia.net/"
 [tool.poetry]
 # see [tool.poetry-dynamic-versioning]
 packages = [{ include = "chia"}]
-version = "0.0.0"
+version = "2.5.7"
 
 [project.scripts]
 chia = "chia.cmds.chia:main"
@@ -116,7 +116,7 @@ upnp = ["miniupnpc"]
 legacy_keyring = ["keyrings.cryptfile"]
 
 [tool.poetry-dynamic-versioning]
-enable = true
+enable = false
 vcs = "git"
 pattern = "default-unprefixed"
 format-jinja = """
